@@ -32,7 +32,7 @@ jobs:
           script: |
             const { findNextVersion } = require('./.github/scripts/find-version.js');
             const tags = process.env.EDGE_TAGS.split(',');
-            const branch = github.context.ref.replace('refs/heads/', '');
+            const branch = context.ref.replace('refs/heads/', '');
             const version = findNextVersion(tags, branch);
             return `${version.major}.${version.minor}.${version.patch}-dev${version.preRelease}`;
 
