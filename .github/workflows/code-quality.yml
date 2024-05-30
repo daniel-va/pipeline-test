@@ -1,7 +1,8 @@
 name: code quality
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - '**'
       - '!develop'
@@ -106,6 +107,14 @@ jobs:
       - name: Run prettier
         run: npx prettier --check .
 
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Review Dependencies
+        uses: actions/dependency-review-action@v3
+
   # It would be cleaner and probably more performant to replace this build step
   # with either a non-emitting build or a simple type check.
   # We only have `build` available for now,
@@ -117,6 +126,7 @@ jobs:
     needs:
       - test
       - lint
+      - dependency-review
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
