@@ -2,7 +2,7 @@ name: 'tag commit'
 description: 'Creates or updates a commit tag'
 inputs:
   TAG_NAME:
-    description: 'The tag\'s name'
+    description: "The tag's name"
     required: true
 
 runs:
