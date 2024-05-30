@@ -41,7 +41,7 @@ runs:
           org.opencontainers.image.version=v${{ inputs.VERSION }}
           org.opencontainers.image.maintainer=EBP Schweiz AG
         flavor: |
-          latest=${{ inputs.TAG == 'latest' }}
+          latest=false
         tags: |
           type=raw,value=${{ inputs.TAG }}
           type=raw,value=${{ inputs.VERSION }}
