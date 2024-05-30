@@ -46,7 +46,7 @@ jobs:
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
           TAG: latest
-          OTHER_TAGS:
+          OTHER_TAGS: |
             type=raw,value=edge
             type=raw,value=release-candidate
           VERSION: ${{ needs.determine_version.outputs.version }}
