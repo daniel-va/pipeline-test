@@ -24,7 +24,7 @@ runs:
             github.rest.git.updateRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${process.env.TAG}',
+              ref: `tags/${process.env.TAG}`,
               sha: context.sha
             });
           })
