@@ -69,3 +69,22 @@ jobs:
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/client-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tag_commit:
+    name: 'tag commit'
+    needs:
+      - determine_version
+      - build_and_push_api
+      - build_and_push_app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: tag edge
+        uses: ./.github/actions/tag-commit
+        with:
+          TAG_NAME: edge
+      - name: tag version
+        uses: ./.github/actions/tag-commit
+        with:
+          TAG_NAME: ${{ needs.determine_version.outputs.version }}
