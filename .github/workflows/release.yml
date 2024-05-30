@@ -49,7 +49,7 @@ jobs:
           OTHER_TAGS:
             type=raw,value=edge
             type=raw,value=release_candidate
-          VERSION: ${{ needs.determine_version.version }}
+          VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -69,7 +69,7 @@ jobs:
           OTHER_TAGS:
             type=raw,value=edge
             type=raw,value=release_candidate
-          VERSION: ${{ needs.determine_version.version }}
+          VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/client-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -98,7 +98,7 @@ jobs:
       - name: tag version
         uses: ./.github/actions/tag-commit
         with:
-          TAG_NAME: ${{ needs.determine_version.version }}
+          TAG_NAME: ${{ needs.determine_version.outputs.version }}
 
   create_release:
     name: 'create release'
