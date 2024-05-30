@@ -28,7 +28,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { findMostRecentVersion } = require('./.github/scripts/find-version.js');
+            const { findNextVersion } = require('./.github/scripts/find-version.js');
             const tags = process.env.EDGE_TAGS.split(',');
             const version = findMostRecentVersion(tags);
             return `${version.major}.${version.minor}.${version.patch}`;
@@ -47,7 +47,7 @@ jobs:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
           TAG: latest
           OTHER_TAGS:
-            edge
+            type=raw,value=edge
             type=raw,value=release-candidate
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
@@ -66,7 +66,7 @@ jobs:
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-app
           TAG: latest
-          OTHER_TAGS:
+          OTHER_TAGS: |
             type=raw,value=edge
             type=raw,value=release-candidate
           VERSION: ${{ needs.determine_version.outputs.version }}
