@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: tag release_candidate
+      - name: tag release-candidate
         uses: ./.github/actions/tag-commit
         with:
-          TAG_NAME: release_candidate
+          TAG_NAME: release-candidate
