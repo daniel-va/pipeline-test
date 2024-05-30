@@ -28,7 +28,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { findNextVersion } = require('./.github/scripts/find-version.js');
+            const { findMostRecentVersion } = require('./.github/scripts/find-version.js');
             const tags = process.env.EDGE_TAGS.split(',');
             const version = findMostRecentVersion(tags);
             return `${version.major}.${version.minor}.${version.patch}`;
