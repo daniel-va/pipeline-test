@@ -1,4 +1,4 @@
-import { Octokit } from '@octokit/rest';
+const { Octokit } = require('@octokit/rest');
 
 const removePackageVersions = async (imageUrl, imageVersions) => {
   const octokit = new Octokit({
