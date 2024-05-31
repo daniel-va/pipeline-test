@@ -152,7 +152,7 @@ jobs:
           TAGS: ${{ steps.get_tags.outputs.tags }}
         with:
           script: |
-            const { findMostRecentVersion, makeVersionTag } = require('./.github/scripts/find-version.js');
+            const { findOutdatedVersions, makeVersionTag } = require('./.github/scripts/find-version.js');
             const { removePackageVersions } = require('./.github/scripts/remove-packages.js');
 
             const tags = process.env.TAGS.split(',');
