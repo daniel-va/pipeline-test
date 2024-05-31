@@ -1,4 +1,4 @@
-name: 'tag commit'
+name: 'Tag Commit'
 description: 'Creates or updates a commit tag'
 inputs:
   TAG_NAME:
