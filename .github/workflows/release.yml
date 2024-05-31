@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   workflow_dispatch:
@@ -28,10 +28,11 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { findMostRecentVersion } = require('./.github/scripts/find-version.js');
+            const { findMostRecentVersion, makeVersionTag } = require('./.github/scripts/find-version.js');
             const tags = process.env.RC_TAGS.split(',');
             const version = findMostRecentVersion(tags);
-            return `${version.major}.${version.minor}.${version.patch}`;
+            version.preRelease = null;
+            return makeVersionTag(version);
 
   build_and_push_api:
     name: 'build and push api'
