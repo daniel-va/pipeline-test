@@ -1,4 +1,4 @@
-name: publish edge
+name: Publish Edge
 
 on:
   push:
