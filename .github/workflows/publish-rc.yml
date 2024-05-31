@@ -5,6 +5,8 @@ on:
     branches:
       - 'main'
 
+permissions: write-all
+
 jobs:
   tag_rc_image_app:
     name: tag rc image app
@@ -44,7 +46,6 @@ jobs:
       - tag_rc_image_app
       - tag_rc_image_api
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
