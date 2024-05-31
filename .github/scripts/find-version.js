@@ -28,45 +28,79 @@ const findNextVersion = (tags, branch) => {
 };
 
 const findMostRecentVersion = (tags) => {
-  const SEMANTIC_VERSION_PATTERN = /^\d+\.\d+\.\d+(?:-dev\d+)?$/;
-  const versions = tags
-    .filter((tag) => SEMANTIC_VERSION_PATTERN.test(tag))
-    .map((tag) => tag.split(/[.\-]/))
-    .map(([major, minor, patch, preRelease]) => ({
-      major: parseInt(major),
-      minor: parseInt(minor),
-      patch: parseInt(patch),
-      preRelease: preRelease && parseInt(preRelease.substring(3)),
-    }))
-    .sort((a, b) => {
-      if (a.major !== b.major) {
-        return b.major - a.major;
-      }
-      if (a.minor !== b.minor) {
-        return b.minor - a.minor;
-      }
-      if (a.patch !== b.patch) {
-        return b.patch - a.patch;
-      }
-      if (a.preRelease !== b.preRelease) {
-        if (a.preRelease == null) {
-          return 1;
-        }
-        if (b.preRelease == null) {
-          return -1;
-        }
-        return a.preRelease - b.preRelease;
-      }
-      return 0;
-    });
-
+  const versions = findAllVersions(tags);
   if (versions.length === 0) {
     throw new Error('unable to find a valid version on current edge tag');
   }
   return versions[0];
 };
 
+const findOutdatedVersions = (tags, recentTag) => {
+  const recentVersion = parseVersion(recentTag);
+  if (recentVersion == null) {
+    throw new Error(`recent tag '${recentTag}' is not a version number`);
+  }
+  const versions = findAllVersions(tags);
+  return versions.filter((version) => (
+      // Select all pre-releases that appear before the most recent one.
+      version.preRelease != null && compareVersions(recentVersion, version) > 0
+  ))
+}
+
+const findAllVersions = (tags) => {
+  return tags
+      .map(parseVersion)
+      .filter((it) => it != null)
+      .sort((a, b) => compareVersions(a, b) * -1);
+}
+
+const SEMANTIC_VERSION_PATTERN = /^\d+\.\d+\.\d+(?:-dev\d+)?$/;
+const parseVersion = (tag) => {
+  if (!SEMANTIC_VERSION_PATTERN.test(tag)) {
+    return null;
+  }
+  const [major, minor, patch, preRelease] = tag.split(/[.\-]/);
+  return {
+    major: parseInt(major),
+    minor: parseInt(minor),
+    patch: parseInt(patch),
+    preRelease: preRelease && parseInt(preRelease.substring(3)),
+  };
+}
+
+const compareVersions = (a, b) => {
+  if (a.major !== b.major) {
+    return a.major - b.major;
+  }
+  if (a.minor !== b.minor) {
+    return a.minor - b.minor;
+  }
+  if (a.patch !== b.patch) {
+    return a.patch - b.patch;
+  }
+  if (a.preRelease !== b.preRelease) {
+    if (a.preRelease == null) {
+      return 1;
+    }
+    if (b.preRelease == null) {
+      return -1;
+    }
+    return a.preRelease - b.preRelease;
+  }
+  return 0;
+};
+
+const makeVersionTag = ({ major, minor, patch, preRelease }) => {
+  const tag = `${major}.${minor}.${patch}`;
+  if (preRelease == null) {
+    return tag;
+  }
+  return `${tag}-dev${preRelease}`;
+}
+
 module.exports = {
   findNextVersion,
   findMostRecentVersion,
+  findOutdatedVersions,
+  makeVersionTag,
 }
