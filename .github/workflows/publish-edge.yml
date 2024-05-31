@@ -84,7 +84,9 @@ jobs:
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
+          SHA: ${{ github.sha }}
       - name: tag version
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: ${{ needs.determine_version.outputs.version }}
+          SHA: ${{ github.sha }}

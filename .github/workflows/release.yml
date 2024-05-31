@@ -88,18 +88,22 @@ jobs:
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: latest
+          SHA: ${{ github.sha }}
       - name: Tag release-candidate
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: release-candidate
+          SHA: ${{ github.sha }}
       - name: Tag edge
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
+          SHA: ${{ github.sha }}
       - name: Tag version
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: ${{ needs.determine_version.outputs.version }}
+          SHA: ${{ github.sha }}
 
   create_release:
     name: 'create release'
