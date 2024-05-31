@@ -12,24 +12,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Get tags of edge commit
-        id: get_edge_tags
+      - name: Get tags of release-candidate commit
+        id: get_rc_tags
         run: |
           git fetch --tags
-          EDGE_COMMIT=$(git rev-list -n 1 edge)
-          EDGE_TAGS=$(printf "%s," $(git tag --contains $EDGE_COMMIT))
-          EDGE_TAGS=${EDGE_TAGS%,}
-          echo "edge_tags=$EDGE_TAGS" >> "$GITHUB_OUTPUT"
+          RC_COMMIT=$(git rev-list -n 1 release-candidate)
+          RC_TAGS=$(printf "%s," $(git tag --contains $RC_COMMIT))
+          RC_TAGS=${RC_TAGS%,}
+          echo "rc_tags=$RC_TAGS" >> "$GITHUB_OUTPUT"
       - name: Find next version
         id: find_version
         uses: actions/github-script@v7
         env:
-          EDGE_TAGS: ${{ steps.get_edge_tags.outputs.edge_tags }}
+          RC_TAGS: ${{ steps.get_rc_tags.outputs.rc_tags }}
         with:
           result-encoding: string
           script: |
             const { findMostRecentVersion } = require('./.github/scripts/find-version.js');
-            const tags = process.env.EDGE_TAGS.split(',');
+            const tags = process.env.RC_TAGS.split(',');
             const version = findMostRecentVersion(tags);
             return `${version.major}.${version.minor}.${version.patch}`;
 
@@ -87,15 +87,15 @@ jobs:
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: latest
-      - name: tag release-candidate
+      - name: Tag release-candidate
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: release-candidate
-      - name: tag edge
+      - name: Tag edge
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
-      - name: tag version
+      - name: Tag version
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: ${{ needs.determine_version.outputs.version }}
@@ -117,4 +117,48 @@ jobs:
           name: 'swissgeol-assets v${{ needs.determine_version.outputs.version }}'
           generate_release_notes: true
           make_latest: true
+
+  cleanup:
+    name: 'cleanup'
+    needs:
+      - determine_version
+      - create_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup node
+        run: |
+          npm install @octokit/rest
+      - name: Get tags
+        id: get_tags
+        run: |
+          git fetch --tags
+          TAGS=$(printf "%s," $(git tag))
+          TAGS=${TAGS%,}
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+      - name: Remove outdated versions
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}
+          CURRENT_VERSION: ${{ needs.determine_version.outputs.version }}
+          TAGS: ${{ steps.get_tags.outputs.tags }}
+        with:
+          script: |
+            const { findMostRecentVersion, makeVersionTag } = require('./.github/scripts/find-version.js');
+            const { removePackageVersions } = require('./.github/scripts/remove-packages.js');
+
+            const tags = process.env.TAGS.split(',');
+            const outdatedVersions = findOutdatedVersions(tags, process.env.CURRENT_VERSION).map(makeVersionTag);
+            for (const version of outdatedVersions) {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${version}`,
+              });
+            }
+
+            await removePackageVersions(`${process.env.BASE_IMAGE_NAME}-api`, outdatedVersions);
+            await removePackageVersions(`${process.env.BASE_IMAGE_NAME}-app`, outdatedVersions);
 
