@@ -47,16 +47,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Get edge commit
+        id: get_edge_commit
+        run: |
+          git fetch --tags
+          EDGE_COMMIT=$(git rev-list -n 1 edge)
+          echo "sha=$EDGE_COMMIT" >> "$GITHUB_OUTPUT"
       - name: tag release-candidate
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: release-candidate
-
-      # We also change the edge tag, as this workflow is most likely triggered by a merge commit,
-      # which means that release-candidate would be one commit ahead of edge.
-      # Re-tagging edge fixes that.
-      # Note that we do not rebuild the Docker image, as we can expect the merge commit to never modify any behaviour.
-      - name: tag edge
-        uses: ./.github/actions/tag-commit
-        with:
-          TAG_NAME: edge
+          SHA: ${{ steps.get_edge_commit.outputs.sha }}
