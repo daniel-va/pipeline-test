@@ -5,10 +5,10 @@ const removePackageVersions = async (imageUrl, imageVersions) => {
     auth: process.env.GITHUB_TOKEN,
   });
 
-  console.log(imageUrl, imageVersions);
-
   const [_imageHost, imageOwner, imageName] = imageUrl.split("/");
   const imageIds = await loadVersionIds(octokit, imageOwner, imageName, imageVersions);
+
+  console.log(imageUrl, imageVersions, imageIds);
   for (const imageId of imageIds) {
     await octokit.rest.packages.deletePackageVersionForUser({
       package_type: 'container',
