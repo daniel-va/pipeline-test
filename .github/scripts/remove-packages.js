@@ -5,6 +5,8 @@ const removePackageVersions = async (imageUrl, imageVersions) => {
     auth: process.env.GITHUB_TOKEN,
   });
 
+  console.log(imageUrl, imageVersions);
+
   const [_imageHost, imageOwner, imageName] = imageUrl.split("/");
   const imageIds = await loadVersionIds(octokit, imageOwner, imageName, imageVersions);
   for (const imageId of imageIds) {
