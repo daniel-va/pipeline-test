@@ -24,6 +24,7 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
   versions = new Set(versions);
 
   const ids = new Set();
+  console.log({versions})
   while (versions.length > 0) {
     const response = await octokit.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
       package_type: 'container',
@@ -31,11 +32,11 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
       username: imageOwner,
       page,
     });
+    console.log({response})
     if (response.length === 0) {
       break;
     }
     for (const entry of response) {
-      console.log(entry);
       if (versions.remove(entry.name)) {
         ids.add(entry.id);
       }
