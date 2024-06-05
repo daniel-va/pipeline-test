@@ -35,8 +35,8 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
       break;
     }
     for (const entry of response) {
+      console.log(entry);
       if (versions.remove(entry.name)) {
-        console.log(entry.name, '=>', entry);
         ids.add(entry.id);
       }
     }
