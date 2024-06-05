@@ -36,7 +36,9 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
     }
     console.log(response.data.map((it) => ({ name: it.name, c: JSON.stringify(it.metadata.container.tags) })));
     for (const entry of response.data) {
-      if (versions.delete(entry.name)) {
+      const { tags } = entry.metadata.container;
+      const matchedTags = tags.filter((tag) => versions.remove(tag));
+      if (tags.length === 0 || matchedTags.length !== 0) {
         ids.add(entry.id);
       }
     }
