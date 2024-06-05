@@ -31,6 +31,7 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
       username: imageOwner,
       page,
     });
+    console.log(response)
     if (response.length === 0) {
       break;
     }
