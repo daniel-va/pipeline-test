@@ -6,9 +6,7 @@ const removePackageVersions = async (imageUrl, imageVersions) => {
   });
 
   const [_imageHost, imageOwner, imageName] = imageUrl.split("/");
-  const imageIds = await loadVersionIds(octokit, imageOwner, imageName, imageVersions);
-
-  console.log(imageUrl, imageVersions, imageIds);
+  const imageIds = await loadOutdatedVersionIds(octokit, imageOwner, imageName, imageVersions);
   for (const imageId of imageIds) {
     await octokit.rest.packages.deletePackageVersionForUser({
       package_type: 'container',
@@ -19,12 +17,12 @@ const removePackageVersions = async (imageUrl, imageVersions) => {
   }
 }
 
-const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
+const loadOutdatedVersionIds = async (octokit, imageOwner, imageName, versions) => {
   let page = 0;
   versions = new Set(versions);
 
   const ids = new Set();
-  while (versions.size > 0) {
+  while (true) {
     const response = await octokit.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
       package_type: 'container',
       package_name: imageName,
@@ -36,6 +34,8 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
     }
     console.log(response.data.map((it) => ({ name: it.name, c: JSON.stringify(it.metadata.container.tags) })));
     for (const entry of response.data) {
+      // Match any of the requested version's ids,
+      // as well as any ids that do not have a tag anymore, i.e. are fully unused.
       const { tags } = entry.metadata.container;
       const matchedTags = tags.filter((tag) => versions.delete(tag));
       if (tags.length === 0 || matchedTags.length !== 0) {
