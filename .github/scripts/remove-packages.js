@@ -34,6 +34,7 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
     if (response.data.length === 0) {
       break;
     }
+    console.log(response.data)
     for (const entry of response.data) {
       if (versions.delete(entry.name)) {
         ids.add(entry.id);
@@ -41,6 +42,7 @@ const loadVersionIds = async (octokit, imageOwner, imageName, versions) => {
     }
     page += 1;
   }
+  console.log({ remaining: versions })
   return ids;
 }
 
