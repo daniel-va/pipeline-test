@@ -8,7 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version number (e.g. 1.12)"
+        description: |
+          Version number (e.g. 1.2.3-dev1).
+          Leave empty to determine the next version automatically.
         required: false
         default: ''
 
