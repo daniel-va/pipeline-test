@@ -13,7 +13,9 @@ on:
         required: false
         default: 'edge'
 
-permissions: write-all
+permissions:
+  packages: write
+  contents: write
 
 env:
   BASE: ${{ github.event.inputs.base || 'edge' }}

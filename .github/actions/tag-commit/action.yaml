@@ -8,8 +8,6 @@ inputs:
     description: "The SHA of the commit to be tagged"
     required: true
 
-permissions: write-all
-
 runs:
   using: 'composite'
   steps:
