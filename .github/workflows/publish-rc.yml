@@ -66,15 +66,6 @@ jobs:
           git fetch --tags
           BASE_COMMIT=$(git rev-list -n 1 $BASE)
           echo "sha=$BASE_COMMIT" >> "$GITHUB_OUTPUT"
-      - name: tag custom
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: release-candidate
-          SHA: ${{ steps.get_base_commit.outputs.sha }}
-        run: |
-          git fetch --tags
-          git tag -f $TAG_NAME $SHA
-          git push --force origin $TAG_NAME
       - name: tag release-candidate
         uses: ./.github/actions/tag-commit
         with:

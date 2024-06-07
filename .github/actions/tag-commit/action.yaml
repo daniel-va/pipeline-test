@@ -20,7 +20,6 @@ runs:
         SHA: ${{ inputs.SHA }}
       with:
         script: |
-          console.log(`tag ${process.env.SHA} with ${process.env.TAG}`)
           github.rest.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
