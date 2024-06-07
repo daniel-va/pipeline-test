@@ -21,9 +21,6 @@ on:
 
 permissions: write-all
 
-env:
-
-
 jobs:
   determine_version:
     name: 'determine version'
