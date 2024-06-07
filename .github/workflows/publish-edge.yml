@@ -19,6 +19,11 @@ on:
         description: "Tag the commit and published image with `edge`."
         default: true
 
+permissions: write-all
+
+env:
+
+
 jobs:
   determine_version:
     name: 'determine version'
