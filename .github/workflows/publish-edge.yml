@@ -8,11 +8,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
+        type: string
         description: |
           Version number (e.g. 1.2.3-dev1).
           Leave empty to determine the next version automatically.
         required: false
         default: ''
+      is-edge:
+        type: boolean
+        description: "Tag the commit and published image with `edge`."
+        default: true
 
 jobs:
   determine_version:
@@ -61,7 +66,7 @@ jobs:
         uses: ./.github/actions/create-image
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
-          TAG: edge
+          TAG: ${{ github.event.inputs.is-edge == 'true' && 'edge' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +83,7 @@ jobs:
         uses: ./.github/actions/create-image
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-app
-          TAG: edge
+          TAG: ${{ github.event.inputs.is-edge == 'true' && 'edge' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/client-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -94,6 +99,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: tag edge
+        if: ${{ github.event.inputs.is-edge == 'true' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
