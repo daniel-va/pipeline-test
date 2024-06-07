@@ -66,7 +66,7 @@ jobs:
         uses: ./.github/actions/create-image
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
-          TAG: ${{ github.event.inputs.is-edge == 'true' && 'edge' || '' }}
+          TAG: ${{ github.event.inputs.is-edge != 'false' && 'edge' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
         uses: ./.github/actions/create-image
         with:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-app
-          TAG: ${{ github.event.inputs.is-edge == 'true' && 'edge' || '' }}
+          TAG: ${{ github.event.inputs.is-edge != 'false' && 'edge' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/client-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,7 +99,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: tag edge
-        if: ${{ github.event.inputs.is-edge == 'true' }}
+        if: ${{ github.event.inputs.is-edge != 'false' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
