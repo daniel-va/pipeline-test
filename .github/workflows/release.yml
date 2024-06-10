@@ -2,6 +2,19 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      base:
+        type: string
+        description: |
+          The tag of the image and commit that will be released.
+          Make sure that you also select that tag as the workflow's run location.
+        required: false
+        default: 'release-candidate'
+
+permissions: write-all
+
+env:
+  BASE: ${{ github.event.inputs.base || 'release-candidate' }}
 
 jobs:
   determine_version:
@@ -12,24 +25,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Get tags of release-candidate commit
-        id: get_rc_tags
+      - name: Get tags of base commit
+        id: get_base_tags
         run: |
           git fetch --tags
-          RC_COMMIT=$(git rev-list -n 1 release-candidate)
-          RC_TAGS=$(printf "%s," $(git tag --contains $RC_COMMIT))
-          RC_TAGS=${RC_TAGS%,}
-          echo "rc_tags=$RC_TAGS" >> "$GITHUB_OUTPUT"
+          BASE_COMMIT=$(git rev-list -n 1 release-candidate)
+          BASE_TAGS=$(printf "%s," $(git tag --contains $BASE_COMMIT))
+          BASE_TAGS=${BASE_TAGS%,}
+          echo "base_tags=$BASE_TAGS" >> "$GITHUB_OUTPUT"
       - name: Find next version
         id: find_version
         uses: actions/github-script@v7
         env:
-          RC_TAGS: ${{ steps.get_rc_tags.outputs.rc_tags }}
+          BASE_TAGS: ${{ steps.get_base_tags.outputs.base_tags }}
         with:
           result-encoding: string
           script: |
             const { findMostRecentVersion, makeVersionTag } = require('./.github/scripts/find-version.js');
-            const tags = process.env.RC_TAGS.split(',');
+            const tags = process.env.BASE_TAGS.split(',');
             const version = findMostRecentVersion(tags);
             version.preRelease = null;
             return makeVersionTag(version);
@@ -49,7 +62,7 @@ jobs:
           TAG: latest
           OTHER_TAGS: |
             type=raw,value=edge
-            type=raw,value=release-candidate
+            type=raw,value=${{  }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
