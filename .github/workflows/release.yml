@@ -25,6 +25,8 @@ permissions: write-all
 
 env:
   BASE: ${{ github.event.inputs.base || 'release-candidate' }}
+  IS_EDGE: ${{ github.event.inputs.is-edge == 'true' }}
+  IS_RC: ${{ github.event.inputs.is-release-candidate == 'true' }}
 
 jobs:
   determine_version:
@@ -71,8 +73,8 @@ jobs:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
           TAG: latest
           OTHER_TAGS: |
-            type=raw,value=${{ github.event.inputs.is-edge != '' && 'edge' || '' }}
-            type=raw,value=${{ github.event.inputs.is-release-candidate != '' && 'release-candidate' || '' }}
+            type=raw,value=${{ env.IS_EDGE == 'true' && 'edge' || '' }}
+            type=raw,value=${{ env.IS_RC == 'true' && 'release-candidate' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -113,13 +115,13 @@ jobs:
           TAG_NAME: latest
           SHA: ${{ github.sha }}
       - name: Tag release-candidate
-        if: ${{ github.event.inputs.is-release-candidate != '' }}
+        if: ${{ env.IS_RC == 'true' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: release-candidate
           SHA: ${{ github.sha }}
       - name: Tag edge
-        if: ${{ github.event.inputs.is-edge != '' }}
+        if: ${{ env.IS_EDGE == 'true' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
