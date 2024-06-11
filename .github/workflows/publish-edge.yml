@@ -57,8 +57,8 @@ jobs:
             const targetBranch = context.payload.ref.replace('refs/heads/', '');
             
             const pullRequests = await github.rest.pulls.list({
-              owner,
-              repo,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               state: 'closed',
               base: targetBranch,
               sort: 'updated',
