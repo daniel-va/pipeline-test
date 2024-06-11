@@ -54,10 +54,24 @@ jobs:
           script: |
             const { findNextVersion } = require('./.github/scripts/find-version.js');
             const tags = process.env.EDGE_TAGS.split(',');
-            const branch = context.payload.ref.replace('refs/heads/', '');
-            console.log(context.payload)
-            console.log(branch)
-            const version = findNextVersion(tags, branch);
+            const targetBranch = context.payload.ref.replace('refs/heads/', '');
+            
+            const pullRequests = await github.pulls.list({
+              owner,
+              repo,
+              state: 'closed',
+              base: targetBranch,
+              sort: 'updated',
+              direction: 'desc'
+            });
+            
+            const mergedPullRequest = pullRequests.data.find(pr => pr.merge_commit_sha === context.payload.after);
+            const sourceBranch = mergedPullRequest == null
+              ? targetBranch
+              : mergedPullRequest.head.ref.replace('refs/heads/', '')
+          
+            console.log({ sourceBranch })
+            const version = findNextVersion(tags, sourceBranch);
             return `${version.major}.${version.minor}.${version.patch}-dev${version.preRelease}`;
 
 
