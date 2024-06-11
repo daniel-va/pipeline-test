@@ -10,7 +10,7 @@ on:
       base:
         type: string
         description: |
-          The tag of the image and commit that will be published as release-candidate.
+          The tag of the commit that will be published as release-candidate.
           Make sure that you also select that tag as the workflow's run location.
         required: false
         default: 'edge'

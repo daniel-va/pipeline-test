@@ -6,19 +6,19 @@ on:
       base:
         type: string
         description: |
-          The tag of the image and commit that will be released.
+          The tag of the commit that will be released.
           Make sure that you also select that tag as the workflow's run location.
         required: false
         default: 'release-candidate'
       is-edge:
         type: boolean
         description: |
-          Also assigns the `edge` tag to this release.
+          Assign the `edge` tag to this release.
         default: true
       is-release-candidate:
         type: boolean
         description: |
-          Also assigns the `release-candidate` tag to this release.
+          Assign the `release-candidate` tag to this release.
         default: true
 
 permissions: write-all
@@ -71,8 +71,8 @@ jobs:
           IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}-api
           TAG: latest
           OTHER_TAGS: |
-            type=raw,value=${{ github.event.inputs.is-edge != 'false' && 'edge' || '' }}
-            type=raw,value=${{ github.event.inputs.is-release-candidate != 'false' && 'release-candidate' || '' }}
+            type=raw,value=${{ github.event.inputs.is-edge != '' && 'edge' || '' }}
+            type=raw,value=${{ github.event.inputs.is-release-candidate != '' && 'release-candidate' || '' }}
           VERSION: ${{ needs.determine_version.outputs.version }}
           DOCKERFILE: ./apps/server-asset-sg/docker/Dockerfile
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -113,13 +113,13 @@ jobs:
           TAG_NAME: latest
           SHA: ${{ github.sha }}
       - name: Tag release-candidate
-        if: ${{ github.event.inputs.is-release-candidate != 'false' }}
+        if: ${{ github.event.inputs.is-release-candidate != '' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: release-candidate
           SHA: ${{ github.sha }}
       - name: Tag edge
-        if: ${{ github.event.inputs.is-edge != 'false' }}
+        if: ${{ github.event.inputs.is-edge != '' }}
         uses: ./.github/actions/tag-commit
         with:
           TAG_NAME: edge
