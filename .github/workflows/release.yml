@@ -171,11 +171,11 @@ jobs:
             const tags = process.env.TAGS.split(',');
             const outdatedVersions = findOutdatedVersions(tags, process.env.CURRENT_VERSION).map(makeVersionTag);
             for (const version of outdatedVersions) {
-              // await github.rest.git.deleteRef({
-              //   owner: context.repo.owner,
-              //   repo: context.repo.repo,
-              //   ref: `tags/${version}`,
-              // });
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${version}`,
+              });
             }
 
             await removePackageVersions(`${process.env.BASE_IMAGE_NAME}-api`, outdatedVersions);
