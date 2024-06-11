@@ -56,10 +56,9 @@ jobs:
             const tags = process.env.EDGE_TAGS.split(',');
             const targetBranch = context.payload.ref.replace('refs/heads/', '');
             
-            console.log(github);
-            const pullRequests = await github.pulls.list({
-              owner,
-              repo,
+            const pullRequests = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               state: 'closed',
               base: targetBranch,
               sort: 'updated',
