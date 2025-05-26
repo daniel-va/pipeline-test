@@ -1,0 +1,23 @@
+name: Publish DEV
+
+on:
+  push:
+    branches:
+      - "develop"
+
+jobs:
+  publish:
+    uses: './.github/workflows/publish.yml'
+    with:
+      tag: edge
+      version_script: |
+        const { findSourceAndTargetBranches } = await import('${{ github.workspace }}/.github/scripts/branch.utils.mjs');
+        const {
+          determineNextDevVersion,
+          stringifyVersion,
+        } = await import('${{ github.workspace }}/.github/scripts/version.utils.mjs');
+        
+        const [source, target] = await findSourceAndTargetBranches(context);
+        const nextVersion = await determineNextDevVersion(source);
+        
+        return stringifyVersion(nextVersion);
