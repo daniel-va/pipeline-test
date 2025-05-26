@@ -14,7 +14,7 @@ on:
     outputs:
       version:
         description: "The version determined via `version_script`."
-        value: ${{ steps.determine-version.outputs.version }}
+        value: ${{ jobs.determine-version.outputs.version }}
 
 
 # Run all publish workflow in sequence to ensure consistent version numbers.
