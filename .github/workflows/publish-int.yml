@@ -5,6 +5,10 @@ on:
     branches:
       - "main"
 
+# Run all publish workflow in sequence to ensure consistent version numbers.
+concurrency:
+  group: "publish"
+
 jobs:
   publish:
     uses: './.github/workflows/publish.yml'
