@@ -11,11 +11,11 @@ jobs:
     with:
       tag: edge
       version_script: |
-        const { findSourceAndTargetBranches } = await import('${{ github.workspace }}/.github/scripts/branch.utils.mjs');
+        const { findSourceAndTargetBranches } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/branch.utils.mjs`);
         const {
           determineNextDevVersion,
           stringifyVersion,
-        } = await import('${{ github.workspace }}/.github/scripts/version.utils.mjs');
+        } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/version.utils.mjs`);
         
         const [source, target] = await findSourceAndTargetBranches(context);
         const nextVersion = await determineNextDevVersion(source);

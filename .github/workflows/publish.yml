@@ -42,6 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
         with:
           result-encoding: string
           script: ${{ inputs.version_script }}
