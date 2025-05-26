@@ -28,11 +28,11 @@ jobs:
     with:
       tag: latest
       version_script: |
-        const { findLatestReleasableVersion } = await import('${{ github.workspace }}/.github/scripts/package.utils.mjs');
+        const { findLatestReleasableVersion } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/package.utils.mjs`);
         const {
         determineNextRcVersionBySourceBranch,
         stringifyVersion,
-        } = await import('${{ github.workspace }}/.github/scripts/version.utils.mjs');
+        } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/version.utils.mjs`);
         
         const releasableVersion = await findLatestReleasableVersion();
         if (releasableVersion === null) {
@@ -89,10 +89,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME }}
           CURRENT_VERSION: ${{ needs.publish.outputs.version }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
         with:
           script: |
-            const { findOutdatedVersions, removePackageVersions } = await import('${{ github.workspace }}/.github/scripts/package.utils.mjs');
-            const { parseVersion, stringifyVersion } = await import('${{ github.workspace }}/.github/scripts/version.utils.mjs');
+            const { findOutdatedVersions, removePackageVersions } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/package.utils.mjs`);
+            const { parseVersion, stringifyVersion } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/version.utils.mjs`);
 
             const version = parseVersion(process.env.CURRENT_VERSION);
             const outdatedVersions = await findOutdatedVersions(version);
